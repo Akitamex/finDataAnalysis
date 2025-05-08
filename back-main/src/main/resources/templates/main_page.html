@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+</head>
+<body>
+
+    <button onclick="showForm('income')">Income</button>
+    <button onclick="showForm('expense')">Expense</button>
+
+    <div id="formContainer"></div>
+
+    <script>
+        function showForm(type) {
+            fetch(`/main-page/${type}-form`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('formContainer').innerHTML = html;
+                });
+        }
+    </script>
+
+    <div id="operationsList">
+        <h2>List of Operations</h2>
+        <ul>
+            <li th:each="operation : ${operations}">
+                <!-- Display operation details here -->
+                <p th:text="${operation.type}"></p>
+                <p th:text="${operation.balance}"></p>
+                <!-- Add more fields as needed -->
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
