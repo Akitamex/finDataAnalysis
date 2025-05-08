@@ -1,0 +1,13 @@
+:root {
+  --mainIris: #2E8DFF;
+  --neutral110: #202020;
+  --primaryGray: #202020;
+  --white: #FFFFFF;
+  --gray80: #232124;
+  --gray100: #F2F4F7;
+}
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
