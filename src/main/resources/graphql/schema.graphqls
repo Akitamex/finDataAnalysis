@@ -1,0 +1,1150 @@
+scalar GraphQLLong
+scalar GraphQLBigDecimal
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+interface Operation {
+  id: ID!
+  type: String!
+  balance: GraphQLBigDecimal!
+  date: String!
+  description: String
+  article: Article
+  company: Company!
+}
+
+type TransferOperation implements Operation {
+  id: ID!
+  type: String!
+  balance: GraphQLBigDecimal!
+  date: String!
+  description: String
+  article: Article
+  company: Company!
+  toBankAccount: BankAccount!
+  fromBankAccount: BankAccount!
+}
+
+type IncomeOperation implements Operation {
+  id: ID!
+  type: String!
+  balance: GraphQLBigDecimal!
+  date: String!
+  description: String
+  article: Article
+  bankAccount: BankAccount!
+  company: Company!
+  project: Project
+  counterparty: Counterparty
+  isObligation: Boolean
+}
+
+type ExpenseOperation implements Operation {
+  id: ID!
+  type: String!
+  balance: GraphQLBigDecimal!
+  date: String!
+  description: String
+  article: Article
+  bankAccount: BankAccount!
+  company: Company!
+  project: Project
+  counterparty: Counterparty
+  projectDirection: ProjectDirection
+  isObligation: Boolean
+  loanPayment: LoanPayment
+}
+
+#------------------------------------------------------- Operations end here ------------------------------------------------------- 
+
+
+#------------------------------------------------------- BankAccount Start! ------------------------------------------------------- 
+interface BankAccount {
+  id: ID!
+  type: String!
+  name: String!
+  legalEntity: LegalEntity!
+  currency: String!
+  balance: GraphQLBigDecimal!
+  company: Company!
+  operations: [Operation]
+}
+
+type BankBankAccount implements BankAccount{
+  id: ID!
+  type: String!
+  name: String!
+  legalEntity: LegalEntity!
+  currency: String!
+  balance: GraphQLBigDecimal!
+  company: Company!
+  bank: String
+  bic: String
+  correspondentAccount: String
+  accountNumber: String
+  operations: [Operation]
+}
+
+type CashBankAccount implements BankAccount{
+  id: ID!
+  type: String!
+  name: String!
+  legalEntity: LegalEntity!
+  currency: String!
+  balance: GraphQLBigDecimal!
+  company: Company!
+  operations: [Operation]
+}
+
+type FundBankAccount implements BankAccount{
+  id: ID!
+  type: String!
+  name: String!
+  legalEntity: LegalEntity!
+  currency: String!
+  balance: GraphQLBigDecimal!
+  company: Company!
+  operations: [Operation]
+}
+
+#------------------------------------------------------- BankAccounts end here ------------------------------------------------------- 
+
+type CashFlowProjectData{
+  projectName: String
+  projectIncomeRows: [String]
+  projectIncome: [[GraphQLBigDecimal]]
+  projectIncomeSum: [GraphQLBigDecimal]
+  projectExpenseRows: [String]
+  projectExpense: [[GraphQLBigDecimal]]
+  projectExpenseSum: [GraphQLBigDecimal]
+  projectTotal: [GraphQLBigDecimal]
+}
+
+type CashFlowByActivity{
+  firstIncomeArticles: [String]
+  firstIncome:[[GraphQLBigDecimal]]
+  firstIncomeSum:[GraphQLBigDecimal]
+  firstExpenseArticles: [String]
+  firstExpense:[[GraphQLBigDecimal]]
+  firstExpenseSum:[GraphQLBigDecimal]
+  firstSum: [GraphQLBigDecimal]
+  secondIncomeArticles: [String]
+  secondIncome:[[GraphQLBigDecimal]]
+  secondIncomeSum: [GraphQLBigDecimal]
+  secondExpenseArticles: [String]
+  secondExpense:[[GraphQLBigDecimal]]
+  secondExpenseSum: [GraphQLBigDecimal]
+  secondSum: [GraphQLBigDecimal]
+  thirdIncomeArticles: [String]
+  thirdIncome: [[GraphQLBigDecimal]]
+  thirdIncomeSum: [GraphQLBigDecimal]
+  thirdExpenseArticles: [String]
+  thirdExpense: [[GraphQLBigDecimal]]
+  thirdExpenseSum: [GraphQLBigDecimal]
+  thirdSum: [GraphQLBigDecimal]
+}
+
+type CashFlow{
+  type: String!
+  first: String
+  timeframe: String!
+  grouping: String!
+  bankAccountIds: [ID!]
+  projectIds: [ID!]
+  columns: [String]
+  rows:[String]
+  initialBalanceRows: [String]
+  initialBalance: [[GraphQLBigDecimal]]
+  initialBalanceSum: [GraphQLBigDecimal]
+  incomeRows: [String]
+  income: [[GraphQLBigDecimal]]
+  incomeSum: [GraphQLBigDecimal]
+  expenseRows: [String]
+  expense: [[GraphQLBigDecimal]]
+  expenseSum: [GraphQLBigDecimal]
+  transfer: [String]
+  transferIn: [GraphQLBigDecimal]
+  transferOut: [GraphQLBigDecimal]
+  transferSum: [GraphQLBigDecimal]
+  saldo: [GraphQLBigDecimal]
+  finalBalanceRows: [String]
+  finalBalance: [[GraphQLBigDecimal]]
+  finalBalanceSum: [GraphQLBigDecimal]
+  projectData:[CashFlowProjectData]
+  activityData: CashFlowByActivity
+}
+
+type Item{
+  id: ID!
+  company: Company!
+  type: String!
+  quantity: GraphQLBigDecimal!
+  totalPrice: GraphQLBigDecimal
+  name: String!
+  unit: String!
+  vendorCode: String
+  description: String
+  defaultSellingPrice: GraphQLBigDecimal
+  dspCurrency: String
+  firstShipmentId: ID
+  earliestShipment: String
+}
+
+type Obligation{
+  id: ID!
+  company: Company!
+  type: String!
+  balance: GraphQLBigDecimal
+  currency: String
+  counterparty: Counterparty
+  legalEntity: LegalEntity
+  project: Project
+  date: String
+  description: String
+}
+
+type ItemHistory{
+  id: ID!
+  company: Company!
+  item: Item!
+  isIncoming: Boolean
+  date: String
+  quantity: GraphQLBigDecimal
+  currency: String
+  price: GraphQLBigDecimal
+  total: GraphQLBigDecimal
+  counterparty: Counterparty
+  legalEntity: LegalEntity
+  isInitialBalance: Boolean
+  obligation: Obligation
+}
+
+type Asset{
+  id: ID!
+  company: Company!
+  name: String
+  quantity: GraphQLLong
+  remainingCost: GraphQLBigDecimal
+  wholeCost: GraphQLBigDecimal
+}
+
+type FixedAsset{
+  id: ID!
+  company: Company!
+  name: String
+  quantity: GraphQLLong
+  unitPrice: GraphQLBigDecimal
+  currency: String
+  purchaseDate: String
+  serviceLifeMonths: Int
+  counterparty: Counterparty
+  legalEntity: LegalEntity
+  remainingCost: GraphQLBigDecimal
+  totalCost: GraphQLBigDecimal
+  includeVat: Boolean
+  vat: Int
+  asset: Asset
+}
+
+type Loan {
+    id: ID!
+    company: Company!
+    name: String!
+    currency: String
+    amount: GraphQLBigDecimal
+    interestRate: GraphQLBigDecimal
+    issueDate: String
+    loanTermMonths: Int
+    counterparty: Counterparty
+    legalEntity: LegalEntity
+    amountPaid: GraphQLBigDecimal
+    paymentType: Int
+    totalAmount: GraphQLBigDecimal
+}
+
+type LoanPayment {
+    id: ID!
+    loan: Loan!
+    dueDate: String
+    principalAmount: GraphQLBigDecimal
+    interestAmount: GraphQLBigDecimal
+    totalPayment: GraphQLBigDecimal
+    amountPaid: GraphQLBigDecimal
+    isPaid: Boolean
+}
+
+
+type Article {
+  id: ID!
+  name: String!
+  type: String!
+  description: String
+  articleGroup: ArticleGroup
+  operations: [Operation]
+  company: Company!
+  category: Int!
+  cashFlowType: Int
+}
+
+type ArticleGroup {
+  id: ID!
+  name: String!
+  type: String!
+  articles: [Article]
+  company: Company!
+}
+
+
+type Project {
+  id: ID!
+  type: String!
+  name: String!
+  status: String
+  projectDirection: ProjectDirection
+  operations: [Operation]
+  description: String
+  company: Company!
+}
+
+type ProjectDirection {
+  id: ID!
+  name: String!
+  projects: [Project]
+  company: Company!
+  operations: [ExpenseOperation]
+}
+
+
+type LegalEntity {
+  id: ID!
+  name: String!
+  fullName: String
+  iin: String
+  cor: String
+  msrn: String
+  legalAddress: String
+  phoneNum: String
+  vat: Boolean!
+  bankAccounts: [BankAccount]
+  company: Company!
+}
+
+type Company {
+  id: ID!
+  name: String!
+  shortUrl: String!
+  description: String
+  logoUrl: String
+  brandingReports: String!
+  brandingEmails: String!
+  twitterProfile: String
+  facebookProfile: String
+  linkedinProfile: String
+  operations: [Operation]
+  bankAccounts: [BankAccount]
+  legalEntities: [LegalEntity]
+  articles: [Article]
+  articleGroups: [ArticleGroup]
+  counterparties: [Counterparty]
+  counterpartyGroups: [CounterpartyGroup]
+  projects: [Project]
+  projectDirections: [ProjectDirection]
+}
+
+type Counterparty {
+  id: ID!
+  title: String!
+  fullName: String
+  email: String
+  phoneNum: String
+  counterpartyGroup: CounterpartyGroup
+  description: String
+  company: Company!
+  operations: [Operation]
+  obligations: [Obligation]
+  loans: [Loan]
+  debt: GraphQLBigDecimal
+}
+
+type CounterpartyGroup {
+  id: ID!
+  name: String!
+  counterparties: [Counterparty]
+  company: Company!
+}
+
+type ProfitsLosses {
+  timeframe: String 
+  type: String 
+  columns: [String]
+  rows: [String]
+  revenueSum: [GraphQLBigDecimal]
+  directCostsSum: [GraphQLBigDecimal]
+  directCostsVariablesSum: [GraphQLBigDecimal]
+  directCostsConstantsSum: [GraphQLBigDecimal]
+  grossProfit: [GraphQLBigDecimal]
+  otherIncomeSum: [GraphQLBigDecimal]
+  otherIncomeNames: [String]
+  otherIncome: [[GraphQLBigDecimal]]
+  indirectCostsSum: [GraphQLBigDecimal]
+  indirectCostsNames: [String]
+  indirectCosts: [[GraphQLBigDecimal]]
+  operatingProfits: [GraphQLBigDecimal]
+  taxesSum: [GraphQLBigDecimal]
+  depreciationSum: [GraphQLBigDecimal]
+  netProfit: [GraphQLBigDecimal]
+  withdrawalOfProfitsSum: [GraphQLBigDecimal]
+  withdrawalOfProfitsNames: [String]
+  withdrawalOfProfits: [[GraphQLBigDecimal]]
+  retainedEarnings: [GraphQLBigDecimal]
+  depreciationNames: [String]
+  depreciation: [[GraphQLBigDecimal]]
+  profitsLossesArticles: ProfitsLossesArticles
+  profitsLossesProjects: [ProfitsLossesProjects]
+}
+
+type ProfitsLossesProjects {
+  projectName: String
+  revenueNames: [String]
+  revenue: [[GraphQLBigDecimal]]
+  revenueSum: [GraphQLBigDecimal]
+  directCostsVariablesNames: [String]
+  directCostsVariables: [[GraphQLBigDecimal]]
+  directCostsVariablesSum: [GraphQLBigDecimal]
+  directCostsConstantsNames: [String]
+  directCostsConstants: [[GraphQLBigDecimal]]
+  directCostsConstantsSum: [GraphQLBigDecimal]
+  grossProfit: [GraphQLBigDecimal]
+  taxesNames: [String]
+  taxes: [[GraphQLBigDecimal]]
+}
+
+type ProfitsLossesArticles {
+  revenueNames: [String]
+  revenue: [[GraphQLBigDecimal]]
+  directCostsVariablesNames: [String]
+  directCostsVariables: [[GraphQLBigDecimal]]
+  directCostsConstantsNames: [String]
+  directCostsConstants: [[GraphQLBigDecimal]]
+  taxesNames: [String]
+  taxes: [[GraphQLBigDecimal]]
+}
+
+type CostAnalysis {
+  rows: [String]
+  columns: [String]
+  entries: [[GraphQLBigDecimal]]
+}
+
+type DebtAnalysis {
+  rows: [String]
+  accountsRecievableNames: [String]
+  accountsRecievableSum: GraphQLBigDecimal
+  accountsRecievable: [GraphQLBigDecimal]
+  accountsPayableNames: [String]
+  accountsPayableSum: GraphQLBigDecimal
+  accountsPayable: [GraphQLBigDecimal]
+  debtNames: [String]
+  debts: [GraphQLBigDecimal]
+  total: GraphQLBigDecimal
+  debtAnalysisProjectsRecievable: [DebtAnalysisProjectsRecievable]
+  debtAnalysisProjectsPayable: [DebtAnalysisProjectsPayable]
+}
+
+type DebtAnalysisProjectsRecievable {
+  projectName: String
+  accountsRecievableNames: [String]
+  accountsRecievableSum: GraphQLBigDecimal
+  accountsRecievable: [GraphQLBigDecimal]
+}
+
+type DebtAnalysisProjectsPayable {
+  projectName: String
+  accountsPayableNames: [String]
+  accountsPayableSum: GraphQLBigDecimal
+  accountsPayable: [GraphQLBigDecimal]
+}
+
+input DateRangeInput {
+  startDate: String
+  endDate: String
+}
+
+input CreateTransferOperationInput {
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    toBankAccountId: ID!
+    fromBankAccountId: ID!
+}
+input CreateIncomeOperationInput {
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    bankAccountId: ID!
+    projectId: ID
+    counterpartyId: ID
+    isObligation: Boolean
+}
+input CreateExpenseOperationInput {
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    bankAccountId: ID!
+    projectId: ID
+    counterpartyId: ID
+    isObligation: Boolean
+    projectDirectionId: ID
+}
+
+input UpdateTransferOperationInput {
+    id: ID!
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    toBankAccountId: ID!
+    fromBankAccountId: ID!
+}
+input UpdateIncomeOperationInput {
+    id: ID!
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    bankAccountId: ID!
+    projectId: ID
+    counterpartyId: ID
+    isObligation: Boolean
+}
+
+input UpdateExpenseOperationInput {
+    id: ID!
+    companyId: ID!
+    balance: GraphQLBigDecimal!
+    date: String!
+    description: String
+    articleId: ID
+    bankAccountId: ID!
+    projectId: ID
+    counterpartyId: ID
+    projectDirectionId: ID
+    isObligation: Boolean
+}
+
+input CreateBankBankAccountInput{
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLBigDecimal!
+    bank: String
+    bic: String
+    correspondentAccount: String
+    accountNumber: String
+}
+
+input CreateCashBankAccountInput {
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLLong!
+}
+
+input CreateFundBankAccountInput {
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLBigDecimal!
+}
+
+input UpdateBankBankAccountInput {
+    id: ID!
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLBigDecimal!
+    bank: String
+    bic: String
+    correspondentAccount: String
+    accountNumber: String
+}
+
+input UpdateCashBankAccountInput{
+    id: ID!
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLBigDecimal!
+}
+
+input UpdateFundBankAccountInput{
+    id: ID!
+    companyId: ID!
+    name: String!
+    legalEntityId: ID!
+    currency: String!
+    balance: GraphQLBigDecimal!
+}
+
+input CreateCounterpartyInput{
+    companyId: ID!
+    counterpartyGroupId: ID
+    title: String!
+    fullName: String
+    email: String
+    phoneNum: String
+    description: String
+}
+
+input UpdateCounterpartyInput {
+    id: ID!
+    companyId: ID!
+    counterpartyGroupId: ID
+    title: String!
+    fullName: String
+    email: String
+    phoneNum: String
+    description: String
+}
+
+input CreateLegalEntityInput {
+    companyId: ID!
+    name: String!
+    fullName: String
+    iin: String
+    cor: String
+    msrn: String
+    legalAddress: String
+    phoneNum: String
+    vat: Boolean!
+}
+
+input UpdateLegalEntityInput {
+    id: ID!
+    companyId: ID!
+    name: String!
+    fullName: String
+    iin: String
+    cor: String
+    msrn: String
+    legalAddress: String
+    phoneNum: String
+    vat: Boolean!
+}
+
+input CreateProjectInput {
+    companyId: ID!
+    type: String!
+    status: String
+    directionId: ID
+    name: String!
+    description: String
+}
+
+input UpdateProjectInput {
+    id: ID!
+    companyId: ID!
+    type: String
+    status: String
+    directionId: ID
+    name: String!
+    description: String
+}
+
+input CompanyInput {
+    name: String!
+    shortUrl: String!
+    description: String
+    logoUrl: String
+    brandingReports: String!
+    brandingEmails: String!
+    twitterProfile: String
+    facebookProfile: String
+    linkedinProfile: String
+}
+
+input CreateArticleInput {
+  companyId: ID!
+  name: String!
+  type: String!
+  articleGroupId: ID
+  description: String
+  category: Int!
+}
+
+input UpdateArticleInput {
+  id: ID!
+  companyId: ID!
+  name: String!
+  type: String!
+  articleGroupId: ID
+  description: String
+  category: Int!
+}
+
+input CreateItemInput{
+  companyId: ID!
+  type: String!
+  quantity: GraphQLLong
+  name: String!
+  unit: String!
+  vendorCode: String
+  description: String
+  defaultSellingPrice: GraphQLBigDecimal
+  setDefault: Boolean 
+  dspCurrency: String 
+  setInitial: Boolean 
+  initialQuantity: GraphQLLong
+  date: String 
+  initialPrice: GraphQLBigDecimal
+  legalEntityId: ID 
+  initialCurrency: String 
+}
+
+input UpdateItemInput{
+  id: ID!
+  companyId: ID!
+  name: String!
+  unit: String!
+  vendorCode: String
+  description: String
+  defaultSellingPrice: GraphQLBigDecimal
+  setDefault: Boolean 
+  dspCurrency: String 
+  setInitial: Boolean 
+  initialQuantity: GraphQLLong
+  date: String 
+  initialPrice: GraphQLBigDecimal
+  legalEntityId: ID 
+  initialCurrency: String 
+}
+
+input CreateItemHistoryInput{
+  companyId: ID!
+  itemId: ID!
+  date: String!
+  quantity: GraphQLLong
+  currency: String
+  price: GraphQLBigDecimal
+  total: GraphQLBigDecimal
+  counterpartyId: ID
+  legalEntityId: ID
+  isInitialBalance: Boolean
+}
+
+input UpdateItemHistoryInput{
+  id: ID!
+  companyId: ID! 
+  currency: String
+  counterpartyId: ID
+  legalEntityId: ID
+  price: GraphQLBigDecimal
+  quantity: GraphQLBigDecimal
+}
+
+input CreateObligationInput{
+  companyId: ID!
+  balance: GraphQLLong
+  currency: String
+  counterpartyId: GraphQLLong!
+  legalEntityId: GraphQLLong!
+  projectId: GraphQLLong
+  date: String!
+  description: String
+  itemHistories: [CreateItemHistoryInput]
+}
+
+input UpdateObligationInput{
+  id: ID!
+  balance: GraphQLBigDecimal
+  currency: String
+  counterpartyId: ID!
+  legalEntityId: ID!
+  projectId: ID
+  description: String
+  itemHistories: [CreateItemHistoryInput]
+}
+
+input CreateFixedAssetInput{
+  companyId: ID!
+  amortise: Boolean!
+  name: String
+  quantity: GraphQLLong!
+  unitPrice: GraphQLBigDecimal!
+  currency: String!
+  purchaseDate: String!
+  serviceLifeMonths: Int!
+  counterpartyId: ID!
+  legalEntityId: ID!
+  includeVat: Boolean!
+  vat: Int
+  assetId: ID
+}
+
+input UpdateFixedAssetInput{
+  id: ID!
+  companyId: ID!
+  quantity: GraphQLLong!
+  unitPrice: GraphQLBigDecimal!
+  currency: String!
+  purchaseDate: String!
+  serviceLifeMonths: Int!
+  counterpartyId: ID!
+  legalEntityId: ID!
+  includeVat: Boolean!
+  vat: Int
+}
+
+input CreateLoanInput {
+    companyId: ID!
+    type: Int
+    name: String!
+    currency: String
+    amount: GraphQLBigDecimal
+    interestRate: GraphQLBigDecimal
+    issueDate: String
+    loanTermMonths: Int
+    counterpartyId: ID
+    legalEntityId: ID
+}
+
+input CreateAssetInput{
+  companyId: ID!
+  name: String!
+}
+
+input UpdateAssetInput{
+  id: ID!
+  companyId: ID!
+  name: String
+}
+
+
+input UpdateLoanInput {
+    id: ID!
+    companyId: ID!
+    name: String!
+    currency: String
+    amount: GraphQLBigDecimal
+    interestRate: GraphQLBigDecimal
+    issueDate: String
+    loanTermMonths: Int
+    counterpartyId: ID
+    legalEntityId: ID
+}
+
+type Query {
+  cashFlow(
+    companyId: ID!,
+    userId: ID!,
+    type: String!,
+    timeframe: String!,
+    grouping: String!,
+    bankAccountIds: [ID!],
+    projectIds: [ID!]
+  ): CashFlow
+
+  profitsLosses(
+    companyId: ID!,
+    userId: ID!,
+    type: String!,
+    timeframe: String!,
+    bankAccountIds: [ID!],
+    projectIds: [ID!]
+  ): ProfitsLosses
+
+  # cashFlowProjectData(
+  #   projectName: String,
+  #   projectIncomeRows: [String]
+  #   projectIncome: [[GraphQLLong]]
+  #   projectIncomeSum: [GraphQLLong]
+  #   projectExpenseRows: [String]
+  #   projectExpense: [[GraphQLLong]]
+  #   projectExpenseSum: [GraphQLLong]
+  #   projectTotal: [GraphQLLong]
+  # ): CashFlowProjectData
+
+  articles(
+    companyId:ID!,
+	  userId: ID!,
+    name: String,
+    articleGroupIds: [ID!],
+    type: [String!],
+    description: String,
+    category: Int
+    ): [Article]
+  articleById(id: ID!, userId: ID!, companyId: ID!): Article
+  articleGroups(
+    companyId: ID!,
+	  userId: ID!,
+    name: String,
+    type: [String!]
+    ): [ArticleGroup]
+  articleGroupById(id: ID!,	userId: ID!, companyId: ID!): ArticleGroup  
+
+  operations(
+    companyId: ID!,
+	  userId: ID!,
+    dateRange: DateRangeInput,
+    articleIds: [ID!],
+    articleGroupIds: [ID!],
+    counterpartyIds: [ID!],
+    counterpartyGroupIds: [ID!],
+    projectIds: [ID!],
+    projectDirectionIds: [ID!],
+    operationTypes: [String!],
+    legalEntityIds: [ID!],
+    bankAccountIds: [ID!],
+    description: String
+  ): [Operation]
+  operationById(id: ID!, userId: ID!, companyId: ID!): Operation
+
+  projects(
+    companyId: ID!,
+	  userId: ID!,
+    types: [String!],
+    statuses: [String!],
+    directionIds: [ID!],
+    name: String,
+    description: String
+  ): [Project]
+  projectById(id: ID!, userId: ID!, companyId: ID!): Project
+  projectDirections(
+    companyId: ID!,
+	  userId: ID!,
+    name: String
+    ): [ProjectDirection]
+  projectDirectionById(id: ID!, userId: ID!, companyId: ID!): ProjectDirection
+ 
+  companies(userId: ID!): [Company] 
+  companyById(id: ID!, userId: ID!): Company
+  legalEntities(
+    companyId: ID!,
+	  userId: ID!,
+    name: String,
+    fullName: String,
+    iin: String,
+    cor: String,
+    msrn: String,
+    legalAddress: String,
+    phoneNum: String,
+    vat: Boolean
+    ): [LegalEntity]
+  legalEntityById(id: ID!, userId: ID!, companyId: ID!): LegalEntity
+  
+  bankAccounts(
+    companyId: ID!,
+    userId: ID!,
+    name: String,
+    currency: String,
+    type: String,
+    bank: String,
+    bic: String,
+    correspondentAccount: String,
+    accountNumber: String,
+    legalEntityIds: [ID!],
+    ids: [ID!]
+    ): [BankAccount]
+  bankAccountById(id: ID!, userId: ID!, companyId: ID!): BankAccount
+
+  counterparties(
+    companyId: ID!,
+	  userId: ID!,
+    groupIds: [ID!],
+    title: String,
+    fullName: String,
+    email: String,
+    phoneNum: String,
+    description: String
+  ): [Counterparty]
+  counterpartyById(id: ID!, userId: ID!, companyId: ID!): Counterparty
+
+  counterpartyGroups(companyId: ID!, userId: ID!, name: String): [CounterpartyGroup]
+  counterpartyGroupById(id: ID!, userId: ID!, companyId: ID!): CounterpartyGroup
+
+  items(
+    companyId: ID!,
+    userId: ID!,
+    name: String,
+    type: [String!],
+    description: String
+  ): [Item]
+
+  itemById(id: ID!, userId: ID!, companyId: ID!): Item
+
+  obligations(
+    companyId: ID!,
+    userId: ID!,
+    dateRange: DateRangeInput,
+    type: [String!],
+    counterpartyIds: [ID!],
+    legalEntityIds: [ID!],
+    projectIds: [ID!],
+    description: String
+  ): [Obligation]
+
+  obligationById(id: ID!, userId: ID!, companyId: ID!): Obligation
+
+  itemHistories(
+    companyId: ID!,
+    userId: ID!,
+    itemId: ID!,
+    dateRange: DateRangeInput,
+    counterpartyIds: [ID!],
+    legalEntityIds: [ID!],
+    isIncoming: Boolean
+  ): [ItemHistory]
+
+  itemHistoryById(id: ID!, userId: ID!, companyId: ID!): ItemHistory
+
+  fixedAssets(
+        companyId: ID!,
+        userId: ID!,
+        amortise: Boolean,
+        name: String,
+        purchaseDate: String,
+        counterpartyIds: [ID!],
+        legalEntityIds: [ID!],
+        includeVat: Boolean
+    ): [FixedAsset]
+  fixedAssetById(id: ID!, userId: ID!, companyId: ID!): FixedAsset
+
+  assets(
+        companyId: ID!,
+        userId: ID!,
+        name: String,
+        quantity: GraphQLLong,
+        remainingCost: GraphQLBigDecimal,
+        wholeCost: GraphQLBigDecimal
+    ): [Asset]
+  assetById(id: ID!, userId: ID!, companyId: ID!): Asset
+
+  findLoans(userId: ID!, companyId: ID!, name: String): [Loan]
+  findLoanById(userId: ID!, companyId: ID!, loanId: ID!): Loan
+  loanPayments(userId: ID!, companyId: ID!, loanId: ID!): [LoanPayment]
+
+  costAnalysis(
+    companyId: ID!,
+    userId: ID!,
+    timeframe: String,
+    grouping: String,
+    bankAccountIds: [ID!],
+    projectIds: [ID!],
+    articleIds: [ID!]
+  ):CostAnalysis
+
+  debtAnalysis(
+    companyId: ID!,
+    userId: ID!,
+    group: Boolean!
+  ):DebtAnalysis
+}
+
+
+type Mutation {
+  createArticle(input: CreateArticleInput, userId: ID!): Article
+  updateArticle(input: UpdateArticleInput, userId: ID!): Article
+  deleteArticle(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  createArticleGroup(companyId: ID!, userId: ID!, name: String!, type: String): ArticleGroup
+  updateArticleGroup(id: ID!, userId: ID!, companyId: ID!, name: String!): ArticleGroup
+  deleteArticleGroup(id: ID!, userId: ID!, companyId: ID!): Boolean
+  
+
+  createTransferOperation(input: CreateTransferOperationInput, userId: ID!): TransferOperation
+  createIncomeOperation(input: CreateIncomeOperationInput, userId: ID!): IncomeOperation
+  createExpenseOperation(input: CreateExpenseOperationInput, userId: ID!): ExpenseOperation
+
+  deleteOperation(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  updateTransferOperation(input: UpdateTransferOperationInput, userId: ID!): TransferOperation
+  updateIncomeOperation(input: UpdateIncomeOperationInput, userId: ID!): IncomeOperation
+  updateExpenseOperation(input: UpdateExpenseOperationInput, userId: ID!): ExpenseOperation
+
+  createBankBankAccount(input: CreateBankBankAccountInput, userId: ID!): BankBankAccount
+  createCashBankAccount(input: CreateCashBankAccountInput, userId: ID!): CashBankAccount
+  createFundBankAccount(input: CreateFundBankAccountInput, userId: ID!): FundBankAccount
+
+  deleteBankAccount(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  updateBankBankAccount(input: UpdateBankBankAccountInput, userId: ID!): BankBankAccount
+  updateCashBankAccount(input: UpdateCashBankAccountInput, userId: ID!): CashBankAccount
+  updateFundBankAccount(input: UpdateFundBankAccountInput, userId: ID!): FundBankAccount
+
+  createCompany(input: CompanyInput!, userId: ID!): Company
+  updateCompany(id:ID!, userId: ID!, input: CompanyInput!): Company
+  deleteCompany(id:ID!, userId: ID!): Boolean
+
+  createCounterparty(input: CreateCounterpartyInput, userId: ID!): Counterparty
+  deleteCounterparty(id: ID!, userId: ID!, companyId: ID!): Boolean
+  updateCounterparty(input: UpdateCounterpartyInput, userId: ID!): Counterparty
+
+  createCounterpartyGroup(
+    companyId: ID!,
+	userId: ID!,
+    name: String!
+  ): CounterpartyGroup
+
+  updateCounterpartyGroup(
+    id: ID!,
+	userId: ID!,
+    companyId: ID!,
+    name: String!
+  ): CounterpartyGroup
+
+  deleteCounterpartyGroup(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  createLegalEntity(input: CreateLegalEntityInput, userId: ID!): LegalEntity
+  updateLegalEntity(input: UpdateLegalEntityInput, userId: ID!): LegalEntity
+  deleteLegalEntity(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  createProject(input: CreateProjectInput, userId: ID!): Project
+  updateProject(input: UpdateProjectInput, userId: ID!): Project
+  deleteProject(id: ID!, userId: ID!, companyId: ID!): Boolean
+  
+  createProjectDirection(name: String!, userId: ID!, companyId: ID!): ProjectDirection
+  deleteProjectDirection(id: ID!, userId: ID!, companyId: ID!): Boolean
+  updateProjectDirection(id: ID!, userId: ID!, name: String!, companyId: ID!): ProjectDirection
+
+  createItem(input: CreateItemInput, userId: ID!): Item
+  deleteItem(id: ID!, userId: ID!, companyId: ID!): Boolean
+  updateItem(input: UpdateItemInput, userId: ID!): Item
+
+  createItemHistory(input: CreateItemHistoryInput, userId: ID!): ItemHistory
+  deleteItemHistory(id: ID!, userId: ID!, companyId: ID!): Boolean
+  updateItemHistory(input: UpdateItemHistoryInput, userId: ID!): ItemHistory
+
+  createObligation(input: CreateObligationInput, userId: ID!): Obligation
+  updateObligation(input: UpdateObligationInput, userId: ID!): Obligation
+  deleteObligation(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  createLoan(userId: ID!, input: CreateLoanInput!): Loan
+  updateLoan(userId: ID!, input: UpdateLoanInput!): Loan
+  applyOperationAsPayment(userId: ID!, loanPaymentId: ID!, operationId: ID!): LoanPayment
+  removeOperationFromPayment(userId: ID!, operationId: ID!): LoanPayment
+  deleteLoan(userId: ID!, companyId: ID!, id: ID!): Boolean
+
+  createFixedAsset(input: CreateFixedAssetInput, userId: ID!): FixedAsset
+  updateFixedAsset(input: UpdateFixedAssetInput, userId: ID!): FixedAsset
+  deleteFixedAsset(id: ID!, userId: ID!, companyId: ID!): Boolean
+
+  createAsset(input: CreateAssetInput, userId: ID!): Asset
+  updateAsset(userId: ID!, input: UpdateAssetInput): Asset
+  deleteAssetById(userId: ID!, companyId: ID!, id: ID!): Boolean
+}

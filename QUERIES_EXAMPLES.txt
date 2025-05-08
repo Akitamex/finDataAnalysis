@@ -1,0 +1,533 @@
+#COMPANY
+
+
+!CREATE    +
+{
+  "query": "mutation createCompany($name: String!) { createCompany(name: $name) { id name } }",
+  "operationName": "createCompany",
+  "variables": {
+    "name": "New Company Name"
+  }
+}
+----------------
+
+!GET BY ID    +
+{
+  "query": "query getCompany($id: ID!) { companyById(id: $id) { id name } }",
+  "operationName": "getCompany",
+  "variables": {
+    "id": "1"
+  }
+}
+-----------------
+
+!GET ALL (belonging to user)   +
+{
+  "query": "query getCompanies { companies { id name } }",
+  "operationName": "getCompanies",
+  "variables": {
+  }
+}
+----------------
+!UPDATE  +
+{
+  "query": "mutation updateCompany($id: ID!, $input: CompanyUpdateInput!) { updateCompany(id: $id, input: $input) { id name } }",
+  "operationName": "updateCompany",
+  "variables": {
+    "id": "1",
+    "input":{
+        "name": "CompanyNameUpd"
+    }
+  }
+}
+#################################################################################################################################################
+
+#LEGAL ENTITY
+
+!CREATE   +
+{
+  "query": "mutation createLegalEntity($input: CreateLegalEntityInput!) { createLegalEntity(input: $input) { id name fullName iin cor msrn legalAddress phoneNum vat } }",
+  "operationName": "createLegalEntity",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "name": "EntityName",
+      "fullName": "Full Entity Name",
+      "iin": "1234567890",
+      "cor": "Certificate of Registration",
+      "msrn": "Main State Registration Number",
+      "legalAddress": "123 Main St, City, Country",
+      "phoneNum": "123456789",
+      "vat": true
+    }
+  }
+}
+-----------------
+
+!UPDATE      +
+{
+  "query": "mutation updateLegalEntity($input: UpdateLegalEntityInput!) { updateLegalEntity(input: $input) { id name fullName iin cor msrn legalAddress phoneNum vat } }",
+  "operationName": "updateLegalEntity",
+  "variables": {
+    "input": {
+      "id": "1",
+      "companyId": "1",
+      "name": "LegalEntityUpdated1",
+      "fullName": "Full Entity Name",
+      "iin": "1234567891",
+      "cor": "2221651321586465432",
+      "msrn": "2221651254665132",
+      "legalAddress": "14 Main St, City, Country",
+      "phoneNum": "123456789",
+      "vat": true
+    }
+  }
+}
+--------------------
+
+!GET BY ID
+{
+"query": "query getLegalEntity($id: ID!, $companyId: ID!) { legalEntityById(id: $id, companyId: $companyId) { id name fullName iin cor msrn legalAddress phoneNum vat bankAccounts {id name balance} company {id name}} }",
+  "operationName": "getLegalEntity",
+  "variables": {
+    "id": "1",
+    "companyId": "1"
+  }
+}
+--------------------
+
+!GET ALL (Can add filters, call me if you are potato)
+{
+"query": "query getLegalEntities($companyId: ID!) { legalEntities(companyId: $companyId) { id name fullName iin cor msrn legalAddress phoneNum vat bankAccounts {id name balance} company {id name}} }",
+  "operationName": "getLegalEntities",
+  "variables": {
+    "companyId": "1"
+  }
+}
+-------------------
+
+
+
+#BANK ACCOUNT
+
+!CREATE type = bank
+{
+  "query": "mutation createBankBankAccount($input: CreateBankBankAccountInput!) { createBankBankAccount(input: $input) { id name balance } }",
+  "operationName": "createBankBankAccount",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "name": "Main Cash Account",
+      "legalEntityId": "1",
+      "currency": "USD",
+      "balance": 1000,
+      "bank": "Kaspi Bank",
+      "bic": "1231354132165",
+      "correspondentAccount": "1565412348915",
+      "accountNumber": "16546851234151"
+    }
+  }
+}
+----------------
+!type = cash
+
+{
+  "query": "mutation createCashBankAccount($input: CreateCashBankAccountInput!) { createCashBankAccount(input: $input) { id name balance } }",
+  "operationName": "createCashBankAccount",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "name": "Cash Account",
+      "legalEntityId": "1",
+      "currency": "USD",
+      "balance": 1000
+    }
+  }
+}
+
+!type = fund
+
+{
+  "query": "mutation createFundBankAccount($input: CreateFundBankAccountInput!) { createFundBankAccount(input: $input) { id name balance } }",
+  "operationName": "createFundBankAccount",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "name": "Fund Account",
+      "legalEntityId": "1",
+      "currency": "USD",
+      "balance": 500
+    }
+  }
+}
+
+!GET BY ID
+{
+"query": "query getBankAccount($id: ID!, $companyId: ID!) { bankAccountById(id: $id, companyId: $companyId) { 
+      id 
+      type 
+      name
+      currency 
+      balance 
+      ... on BankBankAccount {
+        bank
+        bic
+      }
+      legalEntity {
+        id 
+        name 
+        fullName 
+        phoneNum
+        } 
+      operations {
+        id 
+        type 
+        balance
+    } 
+      company {id name}} 
+    }",
+  "operationName": "getBankAccount",
+  "variables": {
+    "id": "1",
+    "companyId": "1"
+  }
+}
+----------------
+
+!GET ALL  {... on TYPENAME {typeSpecificField}}
+{
+  "query": "query getBankAccounts($companyId: ID!) {
+    bankAccounts(companyId: $companyId) {
+      id
+      type
+      name
+      currency
+      balance
+      legalEntity { id name fullName phoneNum }
+      operations { id type balance }
+      company { id name }
+      ... on BankBankAccount {
+        bank
+        bic
+      }
+    }
+  }",
+  "operationName": "getBankAccounts",
+  "variables": {
+    "companyId": "1"
+  }
+}
+-------------------
+!UPDATE type = bank
+
+{
+  "query": "mutation updateBankBankAccount($input: UpdateBankBankAccountInput) {
+    updateBankBankAccount(input: $input) {
+      id
+      type
+      name
+      currency
+      balance
+      legalEntity { id name fullName phoneNum }
+      operations { id type balance }
+      company { id name }
+      ... on BankBankAccount {
+        bank
+        bic
+      }
+    }
+  }",
+  "operationName": "updateBankBankAccount",
+  "variables": {
+    "input" : {
+        "id" : "1",
+        "companyId": "1",
+        "name": "Updated BankAccount",
+        "legalEntityId": "1",
+        "currency": "USD",
+        "balance": 0,
+        "bank": "Halyk",
+        "bic" : "111111111111111111",
+        "correspondentAccount" : "1111111111111111",
+        "accountNumber": "2222222222222222"
+    }
+  }
+}
+------------------
+!type = cash
+
+{
+  "query": "mutation updateCashBankAccount($input: UpdateCashBankAccountInput) {
+    updateCashBankAccount(input: $input) {
+      id
+      type
+      name
+      currency
+      balance
+      legalEntity { id name fullName phoneNum }
+      operations { id type balance }
+      company { id name }
+    }
+  }",
+  "operationName": "updateCashBankAccount",
+  "variables": {
+    "input" : {
+        "id" : "2",
+        "companyId": "1",
+        "name": "Updated Cash BankAccount",
+        "legalEntityId": "1",
+        "currency": "USD",
+        "balance": 0
+    }
+  }
+}
+-----------
+!type = fund
+
+{
+  "query": "mutation updateFundBankAccount($input: UpdateFundBankAccountInput) {
+    updateFundBankAccount(input: $input) {
+      id
+      type
+      name
+      currency
+      balance
+      legalEntity { id name fullName phoneNum }
+      operations { id type balance }
+      company { id name }
+    }
+  }",
+  "operationName": "updateFundBankAccount",
+  "variables": {
+    "input" : {
+        "id" : "3",
+        "companyId": "1",
+        "name": "Updated Fund BankAccount",
+        "legalEntityId": "1",
+        "currency": "USD",
+        "balance": 0
+    }
+  }
+}
+-----------
+
+!DELETE
+
+
+#ARTICLES
+
+!CREATE
+{
+  "query": "mutation CreateArticle($input: CreateArticleInput) { createArticle(input: $input) { id name type  } }",
+  "OperationName": "CreateArticle",
+  "variables": {
+    "input": {
+        "name": "Статья Прихода 1",
+        "type": "INCOME",
+        "companyId": "1"
+    }
+  }
+}
+----------------
+
+!GET ALL
+
+{
+"query": "query getArticles($companyId: ID!) { articles(companyId: $companyId) { 
+      id 
+      type 
+      name
+      group{
+        id
+        name
+      }
+      operations {
+        id 
+        type 
+        balance
+    } 
+      company {id name}} 
+    }",
+  "operationName": "getArticles",
+  "variables": {
+    "companyId": "1"
+  }
+}
+-----------------
+
+
+
+
+#ARTICLE GROUP
+
+!CREATE
+{
+  "query": "mutation CreateArticleGroup($companyId: ID!, $name: String!, $type: String) { createArticleGroup(companyId: $companyId, name: $name, type: $type) { id name type company { id name } } }",
+  "variables": {
+    "companyId": "1",
+    "name": "Без группы",
+    "type": "INCOME"
+  }
+}
+-------------
+
+
+#PROJECT DIRECTION
+
+!CREATE
+
+{
+  "query": "mutation CreateProjectDirection($name: String!, $companyId: ID!) { createProjectDirection(name: $name, companyId: $companyId) { id name projects { id name } company { id name } } }",
+  "variables": {
+    "name": "New Project Direction",
+    "companyId": "1"
+  }
+}
+----------
+
+#PROJECT
+
+!CREATE
+{
+  "query": "mutation CreateProject($input: CreateProjectInput!) { createProject(input: $input) { id type name status description projectDirection { id name } company { id name } } }",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "type": "New Project Type",
+      "status": "IN_PROGRESS",
+      "directionId": "1",
+      "name": "New Project",
+      "description": "This is a new project"
+    }
+  }
+}
+-----------------
+#COUNTERPARTY
+
+!CREATE
+{
+  "query": "mutation CreateCounterparty($input: CreateCounterpartyInput!) { createCounterparty(input: $input) { id title fullName email phoneNum description group { id name } company { id name } } }",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "group": "1",
+      "title": "Acme Corporation",
+      "fullName": "Acme Corporation Ltd.",
+      "email": "contact@acmecorp.com",
+      "phoneNum": "1234567890",
+      "description": "A leading supplier of widgets."
+    }
+  }
+}
+-----------------
+
+#COUNTERPARTY GROUP
+
+!CREATE
+{
+  "query": "mutation CreateCounterparty($input: CreateCounterpartyInput!) { createCounterparty(input: $input) { id title fullName email phoneNum description group { id name } company { id name } } }",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "group": "1",
+      "title": "Acme Corporation",
+      "fullName": "Acme Corporation Ltd.",
+      "email": "contact@acmecorp.com",
+      "phoneNum": "1234567890",
+      "description": "A leading supplier of widgets."
+    }
+  }
+}
+------------------
+
+#OPERATIONS
+
+!CREATE type = INCOME
+
+{
+  "query": "mutation createIncomeOperation($input: CreateIncomeOperationInput!) { createIncomeOperation(input: $input) { id type balance date description company { id name } bankAccount { id name } } }",
+  "operationName": "createIncomeOperation",
+  "variables": {
+    "input": {
+      "companyId": "1",
+      "balance": 5000,
+      "date": "2024-05-08",
+      "description": "Income from services",
+      "bankAccountId": "1",
+      "articleId": "1",
+      "counterpartyId": "1",
+      "projectId": "1"
+    }
+
+  }
+}
+
+-----------
+
+!DELETE
+{
+  "query": "mutation deleteOperation($id: ID!, $companyId: ID!) { deleteOperation(id: $id, companyId: $companyId) }",
+  "operationName": "deleteOperation",
+  "variables": {
+    "id": "1",
+    "companyId": "1"
+  }
+}
+
+----------
+
+!UPDATE type = expense
+{
+  "query": "mutation updateExpenseOperation($input: UpdateExpenseOperationInput!) { updateExpenseOperation(input: $input) { id type balance date description company { id name } bankAccount { id name } project {id name} } }",
+  "operationName": "updateExpenseOperation",
+  "variables": {
+    "input": {
+        "id": 9,
+        "companyId": 1,
+        "projectId": 2,
+        "balance": 500,
+        "date": "2024-05-06",
+        "bankAccountId": 2,
+        "articleId": 5
+    }
+  }
+}
+
+
+!UPDATE type = transfer
+
+
+
+---------------------
+
+
+#CASHFLOW
+
+{
+  "query": "query cashFlow($companyId: ID!, $type: String!, $timeframe: String!, $grouping: String!) { cashFlow(companyId: $companyId, type: $type, timeframe: $timeframe, grouping: $grouping) { first timeframe grouping bankAccountIds projectIds columns rows initialBalanceRows initialBalance initialBalanceSum incomeRows income incomeSum expenseRows expense expenseSum transfer  transferIn transferOut transferSum saldo finalBalanceRows finalBalance finalBalanceSum} }",
+  "operationName": "cashFlow",
+  "variables": {
+      "companyId": "1",
+      "type": "bank",
+      "timeframe": "01.01.2024-31.12.2024",
+      "grouping": "month"
+  }
+}
+
+
+{
+  "query": "query cashFlow($companyId: ID!, $type: String!, $timeframe: String!, $grouping: String!) { cashFlow(companyId: $companyId, type: $type, timeframe: $timeframe, grouping: $grouping) { first timeframe grouping bankAccountIds projectIds columns rows initialBalanceRows initialBalance initialBalanceSum incomeRows income incomeSum expenseRows expense expenseSum transfer  transferIn transferOut transferSum saldo finalBalanceRows finalBalance finalBalanceSum activityData{ firstIncomeArticles firstIncome firstIncomeSum firstExpenseArticles firstExpense firstExpenseSum secondIncomeArticles secondIncome secondIncomeSum secondExpenseArticles secondExpense secondExpenseSum thirdIncomeArticles thirdIncome thirdIncomeSum thirdExpenseArticles thirdExpense thirdExpenseSum }} }",
+  "operationName": "cashFlow",
+  "variables": {
+      "companyId": "1",
+      "type": "activity",
+      "timeframe": "01.01.2024-31.12.2024",
+      "grouping": "month"
+  }
+}
+
+
+jeciwe3925@mcatag.com
+ymnVT2D190BiAdv
+
+_____VAT FORMULA: sum / (1 + vat*0.01) * vat*0.01
